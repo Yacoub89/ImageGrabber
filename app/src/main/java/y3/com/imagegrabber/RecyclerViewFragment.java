@@ -1,13 +1,31 @@
 package y3.com.imagegrabber;
 
 import android.app.Fragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Yacoub on 4/22/2016.
@@ -15,28 +33,24 @@ import android.view.ViewGroup;
 public class RecyclerViewFragment extends Fragment {
 
     private static final String TAG = "RecyclerViewFragment";
-    private static final String KEY_LAYOUT_MANAGER = "layoutManager";
-    private static final int SPAN_COUNT = 2;
-    private static final int DATASET_COUNT = 60;
-
-    private enum LayoutManagerType {
-        GRID_LAYOUT_MANAGER,
-        LINEAR_LAYOUT_MANAGER
-    }
+   // private static final String KEY_LAYOUT_MANAGER = "layoutManager";
+   // private static final int SPAN_COUNT = 2;
+    //private static final int DATASET_COUNT = 60;
 
 
-    protected LayoutManagerType mCurrentLayoutManagerType;
+    //protected RecyclerView.LayoutManager mLayoutManager;
+   // protected String[] mDataset;
 
-
-
-    protected RecyclerView mRecyclerView;
-    protected CustomAdapter mAdapter;
-    protected RecyclerView.LayoutManager mLayoutManager;
-    protected String[] mDataset;
+    private List<FeedItem> feedsList;
+    private RecyclerView mRecyclerView;
+    private MyRecyclerAdapter adapter;
+    private ProgressBar progressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         // Initialize dataset, this data would usually come from a local content provider or
         // remote server.
@@ -46,63 +60,29 @@ public class RecyclerViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_recyclerview, container, false);
+        View rootView = inflater.inflate(R.layout.content_main, container, false);
         rootView.setTag(TAG);
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+
+
+        // Initialize recycler view
+       // mRecyclerView = (RecyclerView) getView().findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
 
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
         // elements are laid out.
-        mLayoutManager = new LinearLayoutManager(getActivity());
+       // mLayoutManager = new LinearLayoutManager(getActivity());
 
-        mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
 
-        if (savedInstanceState != null) {
-            // Restore saved layout manager type.
-            mCurrentLayoutManagerType = (LayoutManagerType) savedInstanceState
-                    .getSerializable(KEY_LAYOUT_MANAGER);
-        }
-        setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new CustomAdapter(mDataset);
-        // Set CustomAdapter as the adapter for RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(adapter);
 
         return rootView;
-    }
-    public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
-        int scrollPosition = 0;
-
-        // If a layout manager has already been set, get current scroll position.
-        if (mRecyclerView.getLayoutManager() != null) {
-            scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
-                    .findFirstCompletelyVisibleItemPosition();
-        }
-
-        switch (layoutManagerType) {
-            case GRID_LAYOUT_MANAGER:
-                mLayoutManager = new GridLayoutManager(getActivity(), SPAN_COUNT);
-                mCurrentLayoutManagerType = LayoutManagerType.GRID_LAYOUT_MANAGER;
-                break;
-            case LINEAR_LAYOUT_MANAGER:
-                mLayoutManager = new LinearLayoutManager(getActivity());
-                mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-                break;
-            default:
-                mLayoutManager = new LinearLayoutManager(getActivity());
-                mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-        }
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.scrollToPosition(scrollPosition);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save currently selected layout manager.
-        savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
-        super.onSaveInstanceState(savedInstanceState);
     }
 
     /**
@@ -110,9 +90,98 @@ public class RecyclerViewFragment extends Fragment {
      * from a local content provider or remote server.
      */
     private void initDataset() {
-        mDataset = new String[DATASET_COUNT];
-        for (int i = 0; i < DATASET_COUNT; i++) {
-            mDataset[i] = "This is element #" + i;
+
+        // Downloading data from below url
+        //final String url = "http://javatechig.com/?json=get_recent_posts&count=45";
+        final String url = "https:api.imgur.com/3/gallery/random/random/1";
+        new AsyncHttpTask().execute(url);
+    }
+
+    public class AsyncHttpTask extends AsyncTask<String, Void, Integer> {
+
+        @Override
+        protected void onPreExecute() {
+
+            //setSupportProgressBarIndeterminateVisibility(true);
+        }
+        @Override
+        protected Integer doInBackground(String... params) {
+            Integer result = 0;
+            HttpURLConnection urlConnection;
+            final String API_key = "656134d0b7404de";
+            try {
+                //URL url = new URL(params[0]);
+               // urlConnection = (HttpURLConnection) url.openConnection();
+               // int statusCode = urlConnection.getResponseCode();
+
+
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpContext localContext = new BasicHttpContext();
+                HttpGet httpGet = new HttpGet(params[0]);
+                httpGet.setHeader("Authorization", "Client-ID "+ API_key);
+                // httpPost = new HttpPost(params[0]);
+
+                final HttpResponse response_back = httpClient.execute(httpGet,
+                        localContext);
+
+                final String response_string = EntityUtils.toString(response_back
+                        .getEntity());
+
+                final JSONObject json = new JSONObject(response_string);
+
+                Log.d("JSON", json.toString()); //for my own understanding
+
+              //  int statusCode = response_back.st
+
+                // 200 represents HTTP OK
+                /*if (statusCode == 200) {
+                    BufferedReader r = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = r.readLine()) != null) {
+                        response.append(line);
+                    }
+                    parseResult(response.toString());
+                    result = 1; // Successful
+                } else {
+                    result = 0; //"Failed to fetch data!";
+                }*/
+            } catch (Exception e) {
+                Log.d(TAG, e.getLocalizedMessage());
+            }
+            return result; //"Failed to fetch data!";
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            // Download complete. Let us update UI
+            progressBar.setVisibility(View.GONE);
+
+            if (result == 1) {
+                adapter = new MyRecyclerAdapter(getActivity(), feedsList);
+                mRecyclerView.setAdapter(adapter);
+            } else {
+                Toast.makeText(getActivity(), "Failed to fetch data!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void parseResult(String result) {
+        try {
+            JSONObject response = new JSONObject(result);
+            JSONArray posts = response.optJSONArray("posts");
+            feedsList = new ArrayList<>();
+
+            for (int i = 0; i < posts.length(); i++) {
+                JSONObject post = posts.optJSONObject(i);
+                FeedItem item = new FeedItem();
+                item.setTitle(post.optString("title"));
+                item.setThumbnail(post.optString("thumbnail"));
+
+                feedsList.add(item);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }
