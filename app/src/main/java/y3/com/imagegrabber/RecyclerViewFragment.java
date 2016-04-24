@@ -12,18 +12,14 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,33 +104,18 @@ public class RecyclerViewFragment extends Fragment {
         protected Integer doInBackground(String... params) {
             Integer result = 0;
             HttpURLConnection urlConnection;
-            final String API_key = "656134d0b7404de";
             try {
-                //URL url = new URL(params[0]);
-               // urlConnection = (HttpURLConnection) url.openConnection();
-               // int statusCode = urlConnection.getResponseCode();
+                URL url = new URL(params[0]);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestProperty("Authorization", "Client-ID 656134d0b7404de");
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setDoInput(true);
+                urlConnection.connect();
 
-
-                HttpClient httpClient = new DefaultHttpClient();
-                HttpContext localContext = new BasicHttpContext();
-                HttpGet httpGet = new HttpGet(params[0]);
-                httpGet.setHeader("Authorization", "Client-ID "+ API_key);
-                // httpPost = new HttpPost(params[0]);
-
-                final HttpResponse response_back = httpClient.execute(httpGet,
-                        localContext);
-
-                final String response_string = EntityUtils.toString(response_back
-                        .getEntity());
-
-                final JSONObject json = new JSONObject(response_string);
-
-                Log.d("JSON", json.toString()); //for my own understanding
-
-              //  int statusCode = response_back.st
+                int statusCode = urlConnection.getResponseCode();
 
                 // 200 represents HTTP OK
-                /*if (statusCode == 200) {
+                if (statusCode == 200) {
                     BufferedReader r = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                     StringBuilder response = new StringBuilder();
                     String line;
@@ -145,7 +126,7 @@ public class RecyclerViewFragment extends Fragment {
                     result = 1; // Successful
                 } else {
                     result = 0; //"Failed to fetch data!";
-                }*/
+                }
             } catch (Exception e) {
                 Log.d(TAG, e.getLocalizedMessage());
             }
