@@ -13,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity
     private List<FeedItem> feedsList;
     private RecyclerView mRecyclerView;
     private MyRecyclerAdapter adapter;
+    private ProgressBar progressBar;
 
 
     @Override
@@ -31,6 +34,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        progressBar = (ProgressBar) this.findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.INVISIBLE);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
