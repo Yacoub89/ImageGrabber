@@ -21,12 +21,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = "RecyclerViewExample";
-    private List<FeedItem> feedsList;
-    private RecyclerView mRecyclerView;
-    private MyRecyclerAdapter adapter;
     private ProgressBar progressBar;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +92,6 @@ public class MainActivity extends AppCompatActivity
             //GET THE PICKED FRAGMENT.
              Fragment fr;
             fr = new RecyclerViewFragment();
-
-
              FragmentManager fm = getFragmentManager();
              FragmentTransaction fragmentTransaction = fm.beginTransaction();
              fragmentTransaction.replace(R.id.main, fr);

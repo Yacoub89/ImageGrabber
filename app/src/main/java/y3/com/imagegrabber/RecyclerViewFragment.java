@@ -29,13 +29,6 @@ import java.util.List;
 public class RecyclerViewFragment extends Fragment {
 
     private static final String TAG = "RecyclerViewFragment";
-   // private static final String KEY_LAYOUT_MANAGER = "layoutManager";
-   // private static final int SPAN_COUNT = 2;
-    //private static final int DATASET_COUNT = 60;
-
-
-    //protected RecyclerView.LayoutManager mLayoutManager;
-   // protected String[] mDataset;
 
     private List<FeedItem> feedsList;
     private RecyclerView mRecyclerView;
@@ -63,9 +56,8 @@ public class RecyclerViewFragment extends Fragment {
 
 
         // Initialize recycler view
-       // mRecyclerView = (RecyclerView) getView().findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+        // Initialize progressBar
         progressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -74,10 +66,6 @@ public class RecyclerViewFragment extends Fragment {
         return rootView;
     }
 
-    /**
-     * Generates Strings for RecyclerView's adapter. This data would usually come
-     * from a local content provider or remote server.
-     */
     private void initDataset() {
 
         // Downloading data from below url
