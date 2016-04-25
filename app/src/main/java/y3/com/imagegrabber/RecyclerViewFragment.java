@@ -88,8 +88,8 @@ public class RecyclerViewFragment extends Fragment {
     private void initDataset() {
 
         // Downloading data from below url
-        //final String url = "http://javatechig.com/?json=get_recent_posts&count=45";
-        final String url = "https:api.imgur.com/3/gallery/random/random/1";
+            //final String url = "http://javatechig.com/?json=get_recent_posts&count=45";
+        final String url = "https://api.imgur.com/3/gallery/random/random/1";
         new AsyncHttpTask().execute(url);
     }
 
@@ -103,13 +103,13 @@ public class RecyclerViewFragment extends Fragment {
         @Override
         protected Integer doInBackground(String... params) {
             Integer result = 0;
-            HttpURLConnection urlConnection;
+                HttpURLConnection urlConnection;
             try {
                 URL url = new URL(params[0]);
                 urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("Authorization", "Client-ID 656134d0b7404de");
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setDoInput(true);
+               urlConnection. setRequestProperty("Authorization", "Client-ID 656134d0b7404de");
+
                 urlConnection.connect();
 
                 int statusCode = urlConnection.getResponseCode();
@@ -150,14 +150,14 @@ public class RecyclerViewFragment extends Fragment {
     private void parseResult(String result) {
         try {
             JSONObject response = new JSONObject(result);
-            JSONArray posts = response.optJSONArray("posts");
+            JSONArray posts = response.optJSONArray("data");
             feedsList = new ArrayList<>();
 
             for (int i = 0; i < posts.length(); i++) {
                 JSONObject post = posts.optJSONObject(i);
                 FeedItem item = new FeedItem();
                 item.setTitle(post.optString("title"));
-                item.setThumbnail(post.optString("thumbnail"));
+                item.setThumbnail(post.optString("link"));
 
                 feedsList.add(item);
             }

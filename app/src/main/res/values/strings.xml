@@ -8,4 +8,6 @@
     <string name="element_text">Element</string>
     <string name="grid_layout_manager">Grid Layout Manager</string>
     <string name="linear_layout_manager">Linear Layout Manager</string>
+    <string name="message_zoom_touch_expand">Touch a photo to expand it.</string>
+    <string name="description_zoom_touch_close">Expanded image (touch to close)</string>
 </resources>

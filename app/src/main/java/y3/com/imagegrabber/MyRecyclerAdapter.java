@@ -1,8 +1,8 @@
 package y3.com.imagegrabber;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,13 +44,17 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<CustomViewHolder> {
                 .into(customViewHolder.imageView);
 
         //Setting text view title
-        customViewHolder.textView.setText(Html.fromHtml(feedItem.getTitle()));
+       // customViewHolder.textView.setText(Html.fromHtml(feedItem.getTitle()));
 
         //Handle click event on both title and image click
-        customViewHolder.textView.setOnClickListener(clickListener);
+       // customViewHolder.textView.setOnClickListener(clickListener);
+
+
+        customViewHolder.thumb1View.setOnClickListener(clickListener);
+
         customViewHolder.imageView.setOnClickListener(clickListener);
 
-        customViewHolder.textView.setTag(customViewHolder);
+      //  customViewHolder.textView.setTag(customViewHolder);
         customViewHolder.imageView.setTag(customViewHolder);
 
     }
@@ -63,6 +67,12 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<CustomViewHolder> {
 
             FeedItem feedItem = feedItemList.get(position);
             Toast.makeText(mContext, feedItem.getTitle(), Toast.LENGTH_SHORT).show();
+
+            Intent fullScreenIntent = new Intent(view.getContext(),FullImageActivity.class);
+            fullScreenIntent.putExtra(FullImageActivity.class.getName(),position) ;
+            //FullImageActivity.getActivity().startActivity(fullScreenIntent);
+
+
         }
     };@Override
 

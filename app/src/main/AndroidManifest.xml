@@ -3,6 +3,12 @@
     package="y3.com.imagegrabber">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-sdk android:minSdkVersion="14"
+        android:targetSdkVersion="23"/>
 
     <application
         android:allowBackup="true"
