@@ -69,13 +69,6 @@ public class RecyclerViewFragment extends Fragment {
         progressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
 
-        // LinearLayoutManager is used here, this will layout the elements in a similar fashion
-        // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
-        // elements are laid out.
-       // mLayoutManager = new LinearLayoutManager(getActivity());
-
-
-
         mRecyclerView.setAdapter(adapter);
 
         return rootView;
@@ -88,7 +81,6 @@ public class RecyclerViewFragment extends Fragment {
     private void initDataset() {
 
         // Downloading data from below url
-            //final String url = "http://javatechig.com/?json=get_recent_posts&count=45";
         final String url = "https://api.imgur.com/3/gallery/random/random/1";
         new AsyncHttpTask().execute(url);
     }
